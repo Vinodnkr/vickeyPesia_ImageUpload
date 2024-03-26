@@ -3,6 +3,7 @@
 // ignore: must_be_immutable
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:p_1/addList.dart';
 import 'package:p_1/pages/about_page.dart';
 import 'package:p_1/pages/second_screen.dart';
@@ -17,17 +18,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeState extends State<HomeScreen> {
   Stream? EmployeeStream;
-      TextEditingController titleController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
   TextEditingController imageController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
   get children => null;
-  
 
   getontheload() async {
     EmployeeStream = await DatabaseMethods().getListDetails();
-  
-
 
     setState(() {});
   }
@@ -61,9 +59,9 @@ class _HomeState extends State<HomeScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         'Title : ' + ds["Title"],
@@ -75,16 +73,26 @@ class _HomeState extends State<HomeScreen> {
                                       Row(
                                         children: [
                                           GestureDetector(
-                                            onTap:(){
-                                              titleController.text=ds['Title'];
-                                              imageController.text=ds['Image'];
-                                              descriptionController.text=ds['Description'];
-                                              EditEmployeeDetails(ds['Id']);
-                                            },
-                                             child: Icon(Icons.edit, color: Colors.orange,)),
+                                              onTap: () {
+                                                titleController.text =
+                                                    ds['Title'];
+                                                imageController.text =
+                                                    ds['Image'];
+                                                descriptionController.text =
+                                                    ds['Description'];
+                                                EditEmployeeDetails(ds['Id']);
+                                              },
+                                              child: Icon(
+                                                Icons.edit,
+                                                color: Colors.orange,
+                                              )),
+                                              GestureDetector(
+                                              onTap:()async{
+                                                await DatabaseMethods().DeleteListDetails(ds['Id']);
+                                              },
+                                              child: Icon(Icons.delete, color:Colors.orange)),
                                         ],
                                       ),
-
                                     ],
                                   ),
 // image display error resolved
@@ -93,18 +101,14 @@ class _HomeState extends State<HomeScreen> {
                                     width: 150,
                                     height: 150,
                                   ),
-
-
-
+// display description
                                   Text(
-                                    'Title : ' + ds['Description'],
+                                    'Description : ' + ds['Description'],
                                     style: TextStyle(
-                                        color: Colors.blue,
-                                        fontSize: 16,
-                                        ),
+                                      color: Colors.blue,
+                                      fontSize: 16,
+                                    ),
                                   ),
-
-
                                 ],
                               ))),
                     );
@@ -112,8 +116,6 @@ class _HomeState extends State<HomeScreen> {
               : Container();
         });
   }
-
-
 
   void searchButton() {}
 
@@ -191,7 +193,8 @@ class _HomeState extends State<HomeScreen> {
               ),
               Text(
                 'Pedia',
-                style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: Colors.orange, fontWeight: FontWeight.bold),
               )
             ],
           ),
@@ -253,7 +256,7 @@ class _HomeState extends State<HomeScreen> {
               'List Of Article',
               style: TextStyle(
                 fontSize: 28,
-                color: Colors.blue,
+                color: Colors.orange,
               ),
             ),
             Expanded(child: allEmployeeDetails()),
@@ -264,118 +267,118 @@ class _HomeState extends State<HomeScreen> {
   }
 
 // POP UP EDIT AREA
-  Future EditEmployeeDetails(String id)=>showDialog(context: context, builder: (content)=> AlertDialog(
-    content:Container(
-      child: Column(children: [
-        Row(
-          children: [
-            GestureDetector(
-              onTap:(){
-                Navigator.pop(context);
-              } ,
-              child: Icon(Icons.cancel)),
-              SizedBox(width: 60,),
+  Future EditEmployeeDetails(String id) => showDialog(
+      context: context,
+      builder: (content) => AlertDialog(
+              content: Container(
+                  child: Column(
+            children: [
+              Row(
+                children: [
+                  GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(Icons.cancel)),
+                  SizedBox(
+                    width: 60,
+                  ),
+                  Text(
+                    "Edit ",
+                    style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "Details",
+                    style: TextStyle(
+                        color: Colors.orange,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 30,
+              ),
               Text(
-                "Edit ",
-                style: TextStyle(color: Colors.blue,
-                fontSize: 24,
-                fontWeight: FontWeight.bold),
+                'Title',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
               ),
-
+              Container(
+                padding: EdgeInsets.only(left: 10),
+                decoration: BoxDecoration(
+                    border: Border.all(),
+                    borderRadius: BorderRadius.circular(10)),
+                child: TextField(
+                  controller: titleController,
+                  decoration: InputDecoration(border: InputBorder.none),
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
               Text(
-                "Details",
-                style: TextStyle(color: Colors.orange,
-                fontSize: 24,
-                fontWeight: FontWeight.bold),
+                'Image',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
               ),
-            
-          ],
-        ),
-  SizedBox(
-              height: 30,
-            ),
-        Text(
-              'Title',
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold),
-            ),
-            Container(
-              padding: EdgeInsets.only(left: 10),
-              decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(10)),
-              child: TextField(
-                controller: titleController,
-                decoration: InputDecoration(border: InputBorder.none),
+              Container(
+                padding: EdgeInsets.only(left: 10),
+                decoration: BoxDecoration(
+                    border: Border.all(),
+                    borderRadius: BorderRadius.circular(10)),
+                child: TextField(
+                  controller: imageController,
+                  maxLines: 2,
+                  decoration: InputDecoration(border: InputBorder.none),
+                ),
               ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-
-            Text(
-              'Image',
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold),
-            ),
-            Container(
-              padding: EdgeInsets.only(left: 10),
-              decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(10)),
-              child: TextField(
-                controller: imageController,
-                maxLines: 2,
-                decoration: InputDecoration(border: InputBorder.none),
+              SizedBox(
+                height: 30,
               ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-
-
-            Text(
-              'Description',
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold),
-            ),
-            Container(
-              padding: EdgeInsets.only(left: 10),
-              decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(10)),
-              child: TextField(
-                controller: descriptionController,
-                maxLines: 5,
-                decoration: InputDecoration(border: InputBorder.none),
+              Text(
+                'Description',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
               ),
-            ),
-
-            SizedBox(
-              height: 30,
-            ),
-
-            ElevatedButton(onPressed: () async{
-              Map<String, dynamic>updateInfo={
-                "Title":titleController.text,
-                "Image":imageController.text,
-                "Description":descriptionController.text,
-                "Id":id,
-              };
-              await DatabaseMethods.UpdateListDetails(id, updateInfo).then((value) {
-                Navigator.pop(content);
-
-              });
-            }, child: Text('Update'))
-
-
-      ],)
-    )
-  ));
+              Container(
+                padding: EdgeInsets.only(left: 10),
+                decoration: BoxDecoration(
+                    border: Border.all(),
+                    borderRadius: BorderRadius.circular(10)),
+                child: TextField(
+                  controller: descriptionController,
+                  maxLines: 5,
+                  decoration: InputDecoration(border: InputBorder.none),
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              ElevatedButton(
+                  onPressed: () async {
+                    Map<String, dynamic> updateInfo = {
+                      "Title": titleController.text,
+                      "Image": imageController.text,
+                      "Description": descriptionController.text,
+                      "Id": id,
+                    };
+                    await DatabaseMethods()
+                        .UpdateListDetails(id, updateInfo)
+                        .then((value) {
+                      Navigator.pop(content);
+                    });
+                  },
+                  child: Text('Update'))
+            ],
+          ))));
 }

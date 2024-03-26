@@ -1,4 +1,6 @@
 
+// ignore_for_file: non_constant_identifier_names, await_only_futures
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseMethods{
@@ -11,9 +13,13 @@ class DatabaseMethods{
     return await FirebaseFirestore.instance.collection("12345").snapshots();
   }
 
-  static UpdateListDetails(String id, Map<String, dynamic> updateInfo) {}
-}
-
 Future UpdateListDetails(String Id, Map<String, dynamic> updateInfo) async{
   return await FirebaseFirestore.instance.collection('12345').doc(Id).set(updateInfo);
 }
+
+
+Future DeleteListDetails(String Id) async{
+  return await FirebaseFirestore.instance.collection('12345').doc(Id).delete();
+}
+}
+
