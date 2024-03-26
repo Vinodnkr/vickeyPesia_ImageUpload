@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "814894867300",
+    "project_id": "vickeypedia-19d2c",
+    "storage_bucket": "vickeypedia-19d2c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:814894867300:android:6d8e959d66ea2c976d9071",
+        "android_client_info": {
+          "package_name": "com.example.p_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFu_WIIqoqAbqPGQ6zppWmsDj2e3rdkLA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
