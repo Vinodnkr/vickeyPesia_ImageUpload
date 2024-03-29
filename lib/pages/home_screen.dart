@@ -1,9 +1,8 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_interpolation_to_compose_strings, non_constant_identifier_names, avoid_unnecessary_containers
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_interpolation_to_compose_strings, non_constant_identifier_names, avoid_unnecessary_containers, use_build_context_synchronously
 
 // ignore: must_be_immutable
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:p_1/addList.dart';
 import 'package:p_1/pages/about_page.dart';
 import 'package:p_1/pages/second_screen.dart';
@@ -46,71 +45,115 @@ class _HomeState extends State<HomeScreen> {
                   itemBuilder: ((context, index) {
                     DocumentSnapshot ds = snapshot.data.docs[index];
                     return Container(
-                      margin: EdgeInsets.only(bottom: 20, left: 30, right: 30),
+                      margin: EdgeInsets.only(top: 30, left: 30, right: 30),
                       child: Material(
-                          elevation: 5.0,
-                          borderRadius: BorderRadius.circular(10),
+                        elevation: 5.0,
+                        borderRadius: BorderRadius.circular(10),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SecondScreen(
+                                        title: ds['Title'],
+                                        image: ds['Image'],
+                                        description: ds['Description'],
+                                        id:ds['Id'],
+                                      )),
+                            );
+                          },
                           child: Container(
-                              padding: EdgeInsets.all(15),
-                              width: MediaQuery.of(context).size.width,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Title : ' + ds["Title"],
-                                        style: TextStyle(
-                                            color: Colors.blue,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Row(
-                                        children: [
-                                          GestureDetector(
-                                              onTap: () {
-                                                titleController.text =
-                                                    ds['Title'];
-                                                imageController.text =
-                                                    ds['Image'];
-                                                descriptionController.text =
-                                                    ds['Description'];
-                                                EditEmployeeDetails(ds['Id']);
-                                              },
-                                              child: Icon(
-                                                Icons.edit,
-                                                color: Colors.orange,
-                                              )),
-                                              GestureDetector(
-                                              onTap:()async{
-                                                await DatabaseMethods().DeleteListDetails(ds['Id']);
-                                              },
-                                              child: Icon(Icons.delete, color:Colors.orange)),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-// image display error resolved
-                                  Image(
-                                    image: NetworkImage(ds["Image"]),
-                                    width: 150,
-                                    height: 150,
-                                  ),
-// display description
-                                  Text(
-                                    'Description : ' + ds['Description'],
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                      fontSize: 16,
+                            padding: EdgeInsets.all(8),
+                            width: MediaQuery.of(context).size.width,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)),
+
+                            // cut
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Title : ' + ds["Title"],
+                                      style: TextStyle(
+                                          color: Colors.blue,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
                                     ),
+                                    SizedBox(
+                                      width: 30,
+                                    ),
+                                    Image(
+                                      image: NetworkImage(ds["Image"]),
+                                      width: 100,
+                                      height: 100,
+                                    ),
+                                  ],
+                                ),
+                                // image display error resolved
+
+                                Row(children: [
+                                  GestureDetector(
+                                      onTap: () {
+                                        titleController.text = ds['Title'];
+                                        imageController.text = ds['Image'];
+                                        descriptionController.text =
+                                            ds['Description'];
+                                        EditEmployeeDetails(ds['Id']);
+                                      },
+                                      child: Icon(
+                                        Icons.edit,
+                                        color: Colors.orange,
+                                      )),
+                                  SizedBox(
+                                    width: 20,
                                   ),
-                                ],
-                              ))),
+   
+                                  IconButton(
+                                    icon: Icon(Icons.delete,
+                                        color: Colors.orange),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Icon(Icons.delete,
+                                                color: Colors.orange),
+                                            content: const Text(
+                                                'Are you sure to delete?'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: const Text('Cancel'),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: const Text('OK'),
+                                                onPressed: () async {
+                                                  await DatabaseMethods()
+                                                      .DeleteListDetails(
+                                                          ds['Id']);
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  )
+
+                                 
+                                ]),
+                              ],
+                            ),
+                          
+                          ),
+                        ),
+                      ),
                     );
                   }))
               : Container();
@@ -167,16 +210,6 @@ class _HomeState extends State<HomeScreen> {
                           builder: (context) => const AboutPage()));
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.details),
-                title: const Text('Details'),
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SecondScreen()));
-                },
-              ),
             ],
           ),
         ),
@@ -214,10 +247,10 @@ class _HomeState extends State<HomeScreen> {
           children: [
             Image.network(
               "https://d1tgh8fmlzexmh.cloudfront.net/ccbp-dynamic-webapps/wiki-logo-img.png",
-              width: 150,
-              height: 150,
+              width: 100,
+              height: 100,
             ),
-            const Text(
+        /*    const Text(
               'Search Bar',
               style: TextStyle(
                 fontSize: 25,
@@ -251,8 +284,8 @@ class _HomeState extends State<HomeScreen> {
             ),
             SizedBox(
               height: 20,
-            ),
-            const Text(
+          ),
+            */  const Text(
               'List Of Article',
               style: TextStyle(
                 fontSize: 28,
