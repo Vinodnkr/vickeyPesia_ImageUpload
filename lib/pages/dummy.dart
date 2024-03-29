@@ -153,4 +153,74 @@ Japan, an archipelago in East Asia, boasts a rich cultural heritage and technolo
 
 
 
+
+
+  Widget allEmployeeDetails() {
+    return StreamBuilder(
+        stream: EmployeeStream,
+        builder: (context, AsyncSnapshot snapshot) {
+          return snapshot.hasData
+              ? ListView.builder(
+                  itemCount: snapshot.data.docs.length,
+                  itemBuilder: ((context, index) {
+                    DocumentSnapshot ds = snapshot.data.docs[index];
+                    return Container(
+                      margin: EdgeInsets.only(top: 30, left: 30, right: 30),
+                      child: Material(
+                        elevation: 5.0,
+                        borderRadius: BorderRadius.circular(10),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SecondScreen(
+                                        title: ds['Title'],
+                                        image: ds['Image'],
+                                        description: ds['Description'],
+                                        id: ds['Id'],
+                                      )),
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            width: MediaQuery.of(context).size.width,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)),
+
+                            // cut
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text(
+                                  'Title: ' + ds["Title"],
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Image(
+                                  image: NetworkImage(ds["Image"]),
+                                  width: 100,
+                                  height: 100,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }))
+              : Container();
+        });
+  }
+
+  void searchButton() {}
+
+
+
+
+
 */

@@ -203,6 +203,7 @@ class _addListState extends State<addList> {
                           fontSize: 20.0);
                       titleController.clear();
                       descriptionController.clear();
+                      imageUrl='';
                     });
                     //imageUrl='';
                   },

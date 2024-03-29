@@ -20,28 +20,72 @@ class _HomeState extends State<HomeScreen> {
   TextEditingController titleController = TextEditingController();
   TextEditingController imageController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  TextEditingController searchController = TextEditingController();
 
 
   List _allResults=[];
- 
+  List resultsList=[];
 
+  getClientStream() async{
+    var data = await FirebaseFirestore.instance.collection("12345").orderBy("Title").get();
+setState(() {
+      _allResults = data.docs;
+    });
+    searchResultList();
+  }
+ 
   getontheload() async {
     EmployeeStream = await DatabaseMethods().getListDetails();
-    var data = await FirebaseFirestore.instance.collection("12345").orderBy("title").get();
-
-    setState(() {
-      _allResults = data.docs;
-
-    });
-  print(_allResults);
-
+    
   }
 
   @override
   void initState() {
     getontheload();
+    searchController.addListener(onSearchChanged);
     super.initState();
   }
+onSearchChanged(){
+  searchResultList();
+ // print(searchController.text);
+}
+searchResultList(){
+  var showResult=[];
+  if (searchController.text !=''){
+      for (var clientSnapShot in _allResults){
+        var name=clientSnapShot['Title'].toString().toLowerCase();
+        if (name.contains(searchController.text.toLowerCase())){
+          showResult.add(clientSnapShot);
+        }
+      }
+  }
+  else{
+    showResult=List.from(_allResults);
+  }
+
+  setState(() {
+    resultsList=showResult;
+  });
+}
+
+@override
+  void dispose() {
+
+    searchController.removeListener(onSearchChanged);
+    searchController.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+
+  @override
+  void didChangeDependencies() {
+
+    getClientStream();
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+  }
+
 
   Widget allEmployeeDetails() {
     return StreamBuilder(
@@ -49,9 +93,9 @@ class _HomeState extends State<HomeScreen> {
         builder: (context, AsyncSnapshot snapshot) {
           return snapshot.hasData
               ? ListView.builder(
-                  itemCount: snapshot.data.docs.length,
+                  itemCount: resultsList.length,
                   itemBuilder: ((context, index) {
-                    DocumentSnapshot ds = snapshot.data.docs[index];
+                  //  DocumentSnapshot ds = snapshot.data.docs[index];
                     return Container(
                       margin: EdgeInsets.only(top: 30, left: 30, right: 30),
                       child: Material(
@@ -63,10 +107,10 @@ class _HomeState extends State<HomeScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => SecondScreen(
-                                        title: ds['Title'],
-                                        image: ds['Image'],
-                                        description: ds['Description'],
-                                        id: ds['Id'],
+                                        title: _allResults[index]['Title'],
+                                        image: _allResults[index]['Image'],
+                                        description: _allResults[index]['Description'],
+                                        id: _allResults[index]['Id'],
                                       )),
                             );
                           },
@@ -81,8 +125,8 @@ class _HomeState extends State<HomeScreen> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                Text(
-                                  'Title: ' + ds["Title"],
+                                Text(resultsList[index]['Title'],
+                                  //'Title: ' + ds["Title"],
                                   style: TextStyle(
                                     color: Colors.blue,
                                     fontSize: 20,
@@ -90,7 +134,7 @@ class _HomeState extends State<HomeScreen> {
                                   ),
                                 ),
                                 Image(
-                                  image: NetworkImage(ds["Image"]),
+                                  image: NetworkImage(resultsList[index]["Image"]),
                                   width: 100,
                                   height: 100,
                                 ),
@@ -104,6 +148,9 @@ class _HomeState extends State<HomeScreen> {
               : Container();
         });
   }
+
+
+
 
   void searchButton() {}
 
@@ -211,7 +258,7 @@ class _HomeState extends State<HomeScreen> {
               child: Column(
                 children: [
                   TextFormField(
-                    // controller: _searchController,
+                     controller: searchController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -223,15 +270,7 @@ class _HomeState extends State<HomeScreen> {
                 ],
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-              onPressed: () {
-                searchButton();
-              },
-              child: const Text('Click to Search'),
-            ),
+            
             SizedBox(
               height: 20,
           ),
