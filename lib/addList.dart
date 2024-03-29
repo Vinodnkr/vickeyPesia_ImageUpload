@@ -3,14 +3,12 @@
 import 'dart:typed_data';
 
 import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:p_1/service/database.dart';
 import 'package:random_string/random_string.dart';
-import 'package:image_picker_web/image_picker_web.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class addList extends StatefulWidget {
   const addList({super.key});
@@ -21,10 +19,15 @@ class addList extends StatefulWidget {
 
 class _addListState extends State<addList> {
   TextEditingController titleController = TextEditingController();
-  TextEditingController imageController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  
+  // ignore: constant_identifier_names
+   String Id = randomAlphaNumeric(10);
+   // ignore: constant_identifier_names, non_constant_identifier_names
+   //static const String Id=id;
 
   String imageUrl = '';
+  bool isloading = false;
   // XFile? image;
 
   @override
@@ -84,70 +87,62 @@ class _addListState extends State<addList> {
             ),
             Padding(
               padding: EdgeInsets.only(top: 20.0),
-              child: IconButton(
-                icon: Icon(
-                  Icons.upload,
-                  size: 30.0,
-                ),
-                color: Colors.orange,
+              child: ElevatedButton.icon(
                 onPressed: () async {
-
-
-
+                 
                   //   getImage();
-FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
-if (result != null) {
-  // Unique file name
-  String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
-   Uint8List? fileBytes = result.files.first.bytes;
- String fileName = result.files.first.name;
-//  print(result);
-  print(fileName);
-  // Upload to Firebase and get reference
-  // Reference referenceRoot = FirebaseStorage.instance.ref();
-  // Reference referenceDirImages = referenceRoot.child('images/');
-  // Reference referenceImageToUpload = referenceDirImages.child(uniqueFileName);
-     try {
-         Reference referenceRoot = FirebaseStorage.instance.ref('images/$uniqueFileName.jpg');
-          //Reference referenceDirImages = referenceRoot.child('images/');
-           //Reference referenceImageToUpload = referenceRoot.child(uniqueFileName);
-      // FirebaseStorage.instance.ref('images/$uniqueFileName+$fileName').putData(fileBytes!);
-      await referenceRoot.putData(fileBytes!);
-       imageUrl = await referenceRoot.getDownloadURL();
-       print('Stored in Firebase');
-       Fluttertoast.showToast(
-                          msg:
-                              " Image uploaded successfully",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.CENTER,
-                          timeInSecForIosWeb: 2,
-                          backgroundColor: Colors.red,
-                          textColor: Colors.white,
-                          fontSize: 20.0);
-        imageUrl = await referenceRoot.getDownloadURL();
-        print(imageUrl);
-     } catch (e) {
-       print(e);
-     }
-      
-}
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(type: FileType.image);
+                  if (result != null) {
+                    setState(() {
+                            isloading = true;
+                          });
+                    // Unique file name
+                    // String uniqueFileName =
+                    //     DateTime.now().millisecondsSinceEpoch.toString();
+                    Uint8List? fileBytes = result.files.first.bytes;
+                    //String fileName = result.files.first.name;
 
-  // // Store the file in Firebase
-  // try {
-  //   await referenceImageToUpload.putFile(File(path!));
-  //   print('Stored in Firebase');
+                    try {
+                      Reference referenceRoot = FirebaseStorage.instance
+                          .ref('images/$Id');
 
-  //   // Get download URL
-  //   imageUrl = await referenceImageToUpload.getDownloadURL();
-  // } catch (e) {
-  //   // Handle any errors
-  //   print(e);
-  // }
+                      await referenceRoot
+                      .putData(fileBytes!, SettableMetadata(contentType: 'image/jpg'))
+                      .whenComplete(() =>
+                          Fluttertoast.showToast(
+                              msg: "Image Uploaded to Firebase",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 2,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 20.0));
+                      setState(() {
+                        isloading = false;
+                      });
+                      imageUrl = await referenceRoot.getDownloadURL();
+                      print(imageUrl);
 
 
+                      //  print(imageUrl);
+                    } catch (e) {
+                     // print(e);
+                    }
+                  }
                 },
+                icon: Icon(Icons.image),
+                label: Text(
+                  'Upload Image',
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
             ),
+            if (isloading)
+              SpinKitThreeBounce(
+                color: Colors.black,
+                size: 20,
+              ),
             SizedBox(
               height: 20,
             ),
@@ -176,7 +171,7 @@ if (result != null) {
               child: ElevatedButton(
                   onPressed: () async {
                     // ignore: non_constant_identifier_names
-                    String Id = randomAlphaNumeric(10);
+                    
                     Map<String, dynamic> listInfoMap = {
                       "Id": Id,
                       "Title": titleController.text,

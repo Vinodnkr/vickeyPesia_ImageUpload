@@ -21,8 +21,6 @@ class _HomeState extends State<HomeScreen> {
   TextEditingController imageController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  get children => null;
-
   getontheload() async {
     EmployeeStream = await DatabaseMethods().getListDetails();
 
@@ -58,7 +56,7 @@ class _HomeState extends State<HomeScreen> {
                                         title: ds['Title'],
                                         image: ds['Image'],
                                         description: ds['Description'],
-                                        id:ds['Id'],
+                                        id: ds['Id'],
                                       )),
                             );
                           },
@@ -73,84 +71,21 @@ class _HomeState extends State<HomeScreen> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      'Title : ' + ds["Title"],
-                                      style: TextStyle(
-                                          color: Colors.blue,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    SizedBox(
-                                      width: 30,
-                                    ),
-                                    Image(
-                                      image: NetworkImage(ds["Image"]),
-                                      width: 100,
-                                      height: 100,
-                                    ),
-                                  ],
-                                ),
-                                // image display error resolved
-
-                                Row(children: [
-                                  GestureDetector(
-                                      onTap: () {
-                                        titleController.text = ds['Title'];
-                                        imageController.text = ds['Image'];
-                                        descriptionController.text =
-                                            ds['Description'];
-                                        EditEmployeeDetails(ds['Id']);
-                                      },
-                                      child: Icon(
-                                        Icons.edit,
-                                        color: Colors.orange,
-                                      )),
-                                  SizedBox(
-                                    width: 20,
+                                Text(
+                                  'Title: ' + ds["Title"],
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
                                   ),
-   
-                                  IconButton(
-                                    icon: Icon(Icons.delete,
-                                        color: Colors.orange),
-                                    onPressed: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: Icon(Icons.delete,
-                                                color: Colors.orange),
-                                            content: const Text(
-                                                'Are you sure to delete?'),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                child: const Text('Cancel'),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
-                                              TextButton(
-                                                child: const Text('OK'),
-                                                onPressed: () async {
-                                                  await DatabaseMethods()
-                                                      .DeleteListDetails(
-                                                          ds['Id']);
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    },
-                                  )
-
-                                 
-                                ]),
+                                ),
+                                Image(
+                                  image: NetworkImage(ds["Image"]),
+                                  width: 100,
+                                  height: 100,
+                                ),
                               ],
                             ),
-                          
                           ),
                         ),
                       ),
@@ -214,26 +149,41 @@ class _HomeState extends State<HomeScreen> {
           ),
         ),
         appBar: AppBar(
-          title: const Row(
+          title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Column(
+                children: [
+                  Image.network(
+                    "https://d1tgh8fmlzexmh.cloudfront.net/ccbp-dynamic-webapps/wiki-logo-img.png",
+                    width: 70,
+                    height: 70,
+                  ),
+                ],
+                
+              ),
+              SizedBox(width: 50,),
+
               Text(
                 'Vicky',
                 style: TextStyle(
-                    fontSize: 30,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold),
+                  fontSize: 30,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 'Pedia',
                 style: TextStyle(
-                    color: Colors.orange, fontWeight: FontWeight.bold),
-              )
+                  color: Colors.orange,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           backgroundColor: Color.fromARGB(255, 132, 244, 190),
         ),
-        floatingActionButton: FloatingActionButton.extended(
+          floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const addList()));
@@ -245,18 +195,8 @@ class _HomeState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image.network(
-              "https://d1tgh8fmlzexmh.cloudfront.net/ccbp-dynamic-webapps/wiki-logo-img.png",
-              width: 100,
-              height: 100,
-            ),
-        /*    const Text(
-              'Search Bar',
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+              SizedBox(height: 20,),
+             
             Form(
               child: Column(
                 children: [
@@ -285,7 +225,7 @@ class _HomeState extends State<HomeScreen> {
             SizedBox(
               height: 20,
           ),
-            */  const Text(
+            const Text(
               'List Of Article',
               style: TextStyle(
                 fontSize: 28,
