@@ -85,6 +85,14 @@ class _addListState extends State<addList> {
                   fontSize: 24,
                   fontWeight: FontWeight.bold),
             ),
+
+            Image.network(
+  imageUrl,
+  width: 150,
+  height: 150,
+)  ,
+
+
             Padding(
               padding: EdgeInsets.only(top: 20.0),
               child: ElevatedButton.icon(
@@ -121,8 +129,11 @@ class _addListState extends State<addList> {
                       setState(() {
                         isloading = false;
                       });
-                      imageUrl = await referenceRoot.getDownloadURL();
-                      print(imageUrl);
+                      var imageUr = await referenceRoot.getDownloadURL();
+                      //print(imageUrl);
+                      setState(() {
+                        imageUrl=imageUr;
+                      });
 
 
                       //  print(imageUrl);
@@ -193,6 +204,7 @@ class _addListState extends State<addList> {
                       titleController.clear();
                       descriptionController.clear();
                     });
+                    //imageUrl='';
                   },
                   child: Text('Add',
                       style: TextStyle(

@@ -23,45 +23,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Named Routes Demo',
-      initialRoute: '/',
-      routes: {
-        '/': (context) =>  HomeScreen(),
-       // '/profile': (context) => const SecondScreen(),
-      },
+      home: 
+       HomeScreen(),
     );
   }
 }
- 
-
-/*
- //1 pick image
-                ImagePicker imagePicker = ImagePicker();
-                 XFile? file = await imagePicker.pickImage(source: ImageSource.gallery);
-                     //print('${file?.path}');
-
-                  //if (file == null) return ;
-                  //unique file name
-                  String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
-
-                  //2 upload to firebase and get reference
-                  Reference referenceRoot = FirebaseStorage.instance.ref();
-                  Reference referenceDirImages = referenceRoot.child('images/');
-                  print('2');
-
-                  //3 reference image to store
-                  Reference referenceImageToUpload =referenceDirImages.child(uniqueFileName);
-                  print('3');
-
-                  //4 store the file in firebase
-                  try {
-                    await referenceImageToUpload.putFile(File(XFile(file.path).path));
-                    print('store in firebase');
-                    //5 download url
-                    imageUrl = await referenceImageToUpload.getDownloadURL();
-                  } catch (e) {
-                    //some error
-                    print(e);
-                  }
-                },
-
-                */

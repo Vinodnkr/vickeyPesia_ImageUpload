@@ -149,8 +149,7 @@ class _SecondScreenState extends State<SecondScreen> {
                            // String fileName = result.files.first.name;
 
                             try {
-                              Reference referenceRoot = FirebaseStorage.instance
-                                  .ref('images/$uniqueFileName');
+                              Reference referenceRoot = FirebaseStorage.instance.ref('images/$uniqueFileName');
                                   print(widget.id);
                                  // print(widget.Id);
 
@@ -164,18 +163,20 @@ class _SecondScreenState extends State<SecondScreen> {
                                       backgroundColor: Colors.red,
                                       textColor: Colors.white,
                                       fontSize: 20.0));
+                              var imageUr = await referenceRoot.getDownloadURL();
+
                               setState(() {
                                 isloading = false;
+                                imageUrl=imageUr.toString();
+                              //  print(imageUrl);
                               });
-                               setState(() async {
-                               imageUrl = await referenceRoot.getDownloadURL();
-                              // print(imageUrl);
 
-                              });
+
+                              
 
                               Map<String, dynamic> updateInfo = {
                         "Title": widget.title,
-                        "Image": imageUrl=="" ? widget.title:imageUrl,
+                        "Image": imageUrl=="" ? widget.image:imageUrl,
                         "Description": widget.description,
                         "Id": widget.id,
                       };
@@ -234,7 +235,7 @@ class _SecondScreenState extends State<SecondScreen> {
                     onPressed: () async {
                       Map<String, dynamic> updateInfo = {
                         "Title": widget.title,
-                        "Image": imageUrl=="" ? widget.title:imageUrl,
+                        "Image": imageUrl=="" ? widget.image:imageUrl,
                         "Description": widget.description,
                         "Id": widget.id,
                       };
@@ -243,6 +244,8 @@ class _SecondScreenState extends State<SecondScreen> {
                           .then((value) {
                         Navigator.pop(context);
                       });
+
+                      imageUrl='';
                     },
                     child: Text('Update'))
 

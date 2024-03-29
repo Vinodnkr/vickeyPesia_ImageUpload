@@ -21,10 +21,20 @@ class _HomeState extends State<HomeScreen> {
   TextEditingController imageController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
+
+  List _allResults=[];
+ 
+
   getontheload() async {
     EmployeeStream = await DatabaseMethods().getListDetails();
+    var data = await FirebaseFirestore.instance.collection("12345").orderBy("title").get();
 
-    setState(() {});
+    setState(() {
+      _allResults = data.docs;
+
+    });
+  print(_allResults);
+
   }
 
   @override
