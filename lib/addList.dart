@@ -20,11 +20,11 @@ class addList extends StatefulWidget {
 class _addListState extends State<addList> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  
+
   // ignore: constant_identifier_names
-   String Id = randomAlphaNumeric(10);
-   // ignore: constant_identifier_names, non_constant_identifier_names
-   //static const String Id=id;
+  String Id = randomAlphaNumeric(10);
+  // ignore: constant_identifier_names, non_constant_identifier_names
+  //static const String Id=id;
 
   String imageUrl = '';
   bool isloading = false;
@@ -85,26 +85,24 @@ class _addListState extends State<addList> {
                   fontSize: 24,
                   fontWeight: FontWeight.bold),
             ),
-
             Image.network(
-  imageUrl,
-  width: 150,
-  height: 150,
-)  ,
-
-
+              imageUrl == ''
+                  ? "https://i.ibb.co/zNtWCLz/Screenshot-2024-03-30-101745.png"
+                  : imageUrl,
+              width: 330,
+              height: 330,
+            ),
             Padding(
               padding: EdgeInsets.only(top: 20.0),
               child: ElevatedButton.icon(
                 onPressed: () async {
-                 
                   //   getImage();
                   FilePickerResult? result =
                       await FilePicker.platform.pickFiles(type: FileType.image);
                   if (result != null) {
                     setState(() {
-                            isloading = true;
-                          });
+                      isloading = true;
+                    });
                     // Unique file name
                     // String uniqueFileName =
                     //     DateTime.now().millisecondsSinceEpoch.toString();
@@ -112,13 +110,13 @@ class _addListState extends State<addList> {
                     //String fileName = result.files.first.name;
 
                     try {
-                      Reference referenceRoot = FirebaseStorage.instance
-                          .ref('images/$Id');
+                      Reference referenceRoot =
+                          FirebaseStorage.instance.ref('images/$Id');
 
                       await referenceRoot
-                      .putData(fileBytes!, SettableMetadata(contentType: 'image/jpg'))
-                      .whenComplete(() =>
-                          Fluttertoast.showToast(
+                          .putData(fileBytes!,
+                              SettableMetadata(contentType: 'image/jpg'))
+                          .whenComplete(() => Fluttertoast.showToast(
                               msg: "Image Uploaded to Firebase",
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.CENTER,
@@ -132,13 +130,12 @@ class _addListState extends State<addList> {
                       var imageUr = await referenceRoot.getDownloadURL();
                       //print(imageUrl);
                       setState(() {
-                        imageUrl=imageUr;
+                        imageUrl = imageUr;
                       });
-
 
                       //  print(imageUrl);
                     } catch (e) {
-                     // print(e);
+                      // print(e);
                     }
                   }
                 },
@@ -182,7 +179,7 @@ class _addListState extends State<addList> {
               child: ElevatedButton(
                   onPressed: () async {
                     // ignore: non_constant_identifier_names
-                    
+
                     Map<String, dynamic> listInfoMap = {
                       "Id": Id,
                       "Title": titleController.text,
@@ -203,9 +200,12 @@ class _addListState extends State<addList> {
                           fontSize: 20.0);
                       titleController.clear();
                       descriptionController.clear();
-                      imageUrl='';
+                      //imageUrl='';
                     });
-                    //imageUrl='';
+                    setState(() {
+                      imageUrl = '';
+                    });
+                    //Navigator.pop(context);
                   },
                   child: Text('Add',
                       style: TextStyle(

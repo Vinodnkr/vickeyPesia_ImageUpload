@@ -43,7 +43,8 @@ class _InlineEditableTextState extends State<InlineEditableText> {
       },
       child: _isEditing
           ? TextField(
-              maxLines: null,
+            minLines: 5,
+              maxLines: 6,
               style: widget.style,
               textAlign: TextAlign.left,
               controller: _controller, // And this line

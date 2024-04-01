@@ -22,21 +22,22 @@ class _HomeState extends State<HomeScreen> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController searchController = TextEditingController();
 
+  List _allResults = [];
+  List resultsList = [];
 
-  List _allResults=[];
-  List resultsList=[];
-
-  getClientStream() async{
-    var data = await FirebaseFirestore.instance.collection("12345").orderBy("Title").get();
-setState(() {
+  getClientStream() async {
+    var data = await FirebaseFirestore.instance
+        .collection("12345")
+        .orderBy("Title")
+        .get();
+    setState(() {
       _allResults = data.docs;
     });
     searchResultList();
   }
- 
+
   getontheload() async {
     EmployeeStream = await DatabaseMethods().getListDetails();
-    
   }
 
   @override
@@ -45,47 +46,44 @@ setState(() {
     searchController.addListener(onSearchChanged);
     super.initState();
   }
-onSearchChanged(){
-  searchResultList();
- // print(searchController.text);
-}
-searchResultList(){
-  var showResult=[];
-  if (searchController.text !=''){
-      for (var clientSnapShot in _allResults){
-        var name=clientSnapShot['Title'].toString().toLowerCase();
-        if (name.contains(searchController.text.toLowerCase())){
+
+  onSearchChanged() {
+    searchResultList();
+    // print(searchController.text);
+  }
+
+  searchResultList() {
+    var showResult = [];
+    if (searchController.text != '') {
+      for (var clientSnapShot in _allResults) {
+        var name = clientSnapShot['Title'].toString().toLowerCase();
+        if (name.contains(searchController.text.toLowerCase())) {
           showResult.add(clientSnapShot);
         }
       }
-  }
-  else{
-    showResult=List.from(_allResults);
+    } else {
+      showResult = List.from(_allResults);
+    }
+
+    setState(() {
+      resultsList = showResult;
+    });
   }
 
-  setState(() {
-    resultsList=showResult;
-  });
-}
-
-@override
+  @override
   void dispose() {
-
     searchController.removeListener(onSearchChanged);
     searchController.dispose();
     // TODO: implement dispose
     super.dispose();
   }
 
-
   @override
   void didChangeDependencies() {
-
     getClientStream();
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
   }
-
 
   Widget allEmployeeDetails() {
     return StreamBuilder(
@@ -95,7 +93,7 @@ searchResultList(){
               ? ListView.builder(
                   itemCount: resultsList.length,
                   itemBuilder: ((context, index) {
-                  //  DocumentSnapshot ds = snapshot.data.docs[index];
+                    // DocumentSnapshot ds = snapshot.data.docs[index];
                     return Container(
                       margin: EdgeInsets.only(top: 30, left: 30, right: 30),
                       child: Material(
@@ -107,10 +105,15 @@ searchResultList(){
                               context,
                               MaterialPageRoute(
                                   builder: (context) => SecondScreen(
-                                        title: _allResults[index]['Title'],
-                                        image: _allResults[index]['Image'],
-                                        description: _allResults[index]['Description'],
-                                        id: _allResults[index]['Id'],
+                                        // title: ds['Title'],
+                                        //   image: ds['Image'],
+                                        //   description: ds['Description'],
+                                        //   id: ds['Id'],
+                                        title: resultsList[index]['Title'],
+                                        image: resultsList[index]['Image'],
+                                        description: resultsList[index]
+                                            ['Description'],
+                                        id: resultsList[index]['Id'],
                                       )),
                             );
                           },
@@ -125,7 +128,8 @@ searchResultList(){
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                Text(resultsList[index]['Title'],
+                                Text(
+                                  resultsList[index]['Title'],
                                   //'Title: ' + ds["Title"],
                                   style: TextStyle(
                                     color: Colors.blue,
@@ -134,7 +138,11 @@ searchResultList(){
                                   ),
                                 ),
                                 Image(
-                                  image: NetworkImage(resultsList[index]["Image"]),
+                                  image: NetworkImage(resultsList[index]
+                                              ["Image"] ==
+                                          ''
+                                      ? 'https://i.ibb.co/zNtWCLz/Screenshot-2024-03-30-101745.png'
+                                      : resultsList[index]["Image"]),
                                   width: 100,
                                   height: 100,
                                 ),
@@ -148,9 +156,6 @@ searchResultList(){
               : Container();
         });
   }
-
-
-
 
   void searchButton() {}
 
@@ -217,10 +222,10 @@ searchResultList(){
                     height: 70,
                   ),
                 ],
-                
               ),
-              SizedBox(width: 50,),
-
+              SizedBox(
+                width: 50,
+              ),
               Text(
                 'Vicky',
                 style: TextStyle(
@@ -240,7 +245,7 @@ searchResultList(){
           ),
           backgroundColor: Color.fromARGB(255, 132, 244, 190),
         ),
-          floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const addList()));
@@ -252,13 +257,14 @@ searchResultList(){
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-              SizedBox(height: 20,),
-             
+            SizedBox(
+              height: 20,
+            ),
             Form(
               child: Column(
                 children: [
                   TextFormField(
-                     controller: searchController,
+                    controller: searchController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -270,10 +276,9 @@ searchResultList(){
                 ],
               ),
             ),
-            
             SizedBox(
               height: 20,
-          ),
+            ),
             const Text(
               'List Of Article',
               style: TextStyle(

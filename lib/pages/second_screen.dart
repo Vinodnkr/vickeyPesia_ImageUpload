@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, use_build_context_synchronously, must_be_immutable
 
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -25,19 +26,31 @@ class SecondScreen extends StatefulWidget {
       required this.description});
 
   @override
-  State<SecondScreen> createState() => _SecondScreenState();
+  _SecondScreenState createState() =>
+      _SecondScreenState(titles: title, descriptions: description);
 }
 
-
-
 class _SecondScreenState extends State<SecondScreen> {
+  late String titles;
+  late String descriptions;
+
+  _SecondScreenState({required this.titles, required this.descriptions});
 
   static String imageUrl = '';
- // final String imageUrl = widget.image;
+  // final String imageUrl = widget.image;
   bool isloading = false;
- 
+  bool _isEditing = false;
+  bool _isEditingDesc = false;
 
+  TextEditingController _controller = TextEditingController();
+  TextEditingController _controllerDesc = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: titles);
+    _controllerDesc = TextEditingController(text: descriptions);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +65,7 @@ class _SecondScreenState extends State<SecondScreen> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Icon(Icons.delete, color: Colors.orange),
-                      content: const Text('Are you sure you want to delete?'),
+                      content: const Text('Are you sure to delete?'),
                       actions: <Widget>[
                         TextButton(
                           child: const Text('Cancel'),
@@ -64,8 +76,22 @@ class _SecondScreenState extends State<SecondScreen> {
                         TextButton(
                           child: const Text('OK'),
                           onPressed: () async {
+                            if (widget.image != null) {
+                              try {
+                                final storageReference = FirebaseStorage
+                                    .instance
+                                    .refFromURL(widget.image);
+                                await storageReference.delete();
+                                print(
+                                    'Image successfully deleted from Firebase Storage.');
+                              } catch (error) {
+                                print('Error deleting image: $error');
+                              }
+                            }
+
                             await DatabaseMethods()
                                 .DeleteListDetails(widget.id);
+
                             Navigator.of(context).pop();
                             Fluttertoast.showToast(
                                 msg: "Deleted",
@@ -75,6 +101,7 @@ class _SecondScreenState extends State<SecondScreen> {
                                 backgroundColor: Colors.red,
                                 textColor: Colors.white,
                                 fontSize: 20.0);
+
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -97,20 +124,36 @@ class _SecondScreenState extends State<SecondScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: InlineEditableText(
-                        text: widget.title,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        onTextChanged: (String value) {
-                          widget.title = value;
-                        },
-                      ),
+                      child: _isEditing
+                          ? TextField(
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              controller: _controller,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  widget.title = newValue;
+                                });
+                              },
+                            )
+                          : Text(
+                              widget.title,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
                     GestureDetector(
                       onTap: () {
-                        setState(() {});
+                        setState(() {
+                          _isEditing = !_isEditing;
+                          if (_isEditing) {
+                            _controller.selection = TextSelection.fromPosition(
+                                TextPosition(offset: _controller.text.length));
+                          }
+                        });
                       },
                       child: Icon(
                         Icons.edit,
@@ -123,7 +166,11 @@ class _SecondScreenState extends State<SecondScreen> {
                 Stack(
                   children: <Widget>[
                     Image(
-                      image: NetworkImage(imageUrl==""? widget.image:imageUrl),
+                      image: NetworkImage(imageUrl == ""
+                          ? widget.image == ""
+                              ? 'https://i.ibb.co/zNtWCLz/Screenshot-2024-03-30-101745.png'
+                              : widget.image
+                          : imageUrl),
                       width: 600,
                       height: 600,
                     ),
@@ -132,29 +179,32 @@ class _SecondScreenState extends State<SecondScreen> {
                       right: 10,
                       child: ElevatedButton.icon(
                         onPressed: () async {
-                          
                           //   getImage();
                           FilePickerResult? result = await FilePicker.platform
                               .pickFiles(type: FileType.image);
                           if (result != null) {
                             setState(() {
-                            isloading = true;
-                          });
+                              isloading = true;
+                            });
                             // Unique file name
-                            String uniqueFileName=widget.id;
+                            String uniqueFileName = widget.id;
                             // String uniqueFileName = DateTime.now()
                             //     .millisecondsSinceEpoch
                             //     .toString();
                             Uint8List? fileBytes = result.files.first.bytes;
-                           // String fileName = result.files.first.name;
+                            // String fileName = result.files.first.name;
 
                             try {
-                              Reference referenceRoot = FirebaseStorage.instance.ref('images/$uniqueFileName');
-                                  print(widget.id);
-                                 // print(widget.Id);
+                              Reference referenceRoot = FirebaseStorage.instance
+                                  .ref('images/$uniqueFileName');
+                              print(widget.id);
+                              // print(widget.Id);
 
                               await referenceRoot
-                                  .putData(fileBytes!, SettableMetadata(contentType: 'image/jpg'))
+                                  .putData(
+                                      fileBytes!,
+                                      SettableMetadata(
+                                          contentType: 'image/jpg'))
                                   .whenComplete(() => Fluttertoast.showToast(
                                       msg: "Image Uploaded to Firebase",
                                       toastLength: Toast.LENGTH_SHORT,
@@ -163,29 +213,27 @@ class _SecondScreenState extends State<SecondScreen> {
                                       backgroundColor: Colors.red,
                                       textColor: Colors.white,
                                       fontSize: 20.0));
-                              var imageUr = await referenceRoot.getDownloadURL();
+                              var imageUr =
+                                  await referenceRoot.getDownloadURL();
 
                               setState(() {
                                 isloading = false;
-                                imageUrl=imageUr.toString();
-                              //  print(imageUrl);
+                                imageUrl = imageUr.toString();
+                                //  print(imageUrl);
                               });
 
-
-                              
-
                               Map<String, dynamic> updateInfo = {
-                        "Title": widget.title,
-                        "Image": imageUrl=="" ? widget.image:imageUrl,
-                        "Description": widget.description,
-                        "Id": widget.id,
-                      };
-                      await DatabaseMethods()
-                          .UpdateListDetails(widget.id, updateInfo)
-                          .then((value) {
-                      });
+                                "Title": widget.title,
+                                "Image":
+                                    imageUrl == "" ? widget.image : imageUrl,
+                                "Description": widget.description,
+                                "Id": widget.id,
+                              };
+                              await DatabaseMethods()
+                                  .UpdateListDetails(widget.id, updateInfo)
+                                  .then((value) {});
                             } catch (e) {
-                             // print(e);
+                              // print(e);
                             }
                           }
                         },
@@ -208,13 +256,48 @@ class _SecondScreenState extends State<SecondScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Description:',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  
+                       _isEditingDesc
+                          ? TextField(
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.normal,
+                              ),
+                              controller: _controllerDesc,
+                                maxLines:5,
+
+                              onChanged: (newValue) {
+                                setState(() {
+                                  widget.description = newValue;
+                                });
+                              },
+                            )
+                          : Text(
+                              widget.description,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                    
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isEditingDesc = !_isEditingDesc;
+                          if (_isEditingDesc) {
+                            _controllerDesc.selection =
+                                TextSelection.fromPosition(TextPosition(
+                                    offset: _controllerDesc.text.length));
+                          }
+                        });
+                      },
+                      child: Icon(
+                        Icons.edit,
+                        color: Colors.orange,
+                      ),
                     ),
-                    SizedBox(height: 8),
-                    InlineEditableText(
+                  ],
+                  /*      InlineEditableText(
                       text: widget.description,
                       style: TextStyle(
                         fontSize: 18,
@@ -224,8 +307,7 @@ class _SecondScreenState extends State<SecondScreen> {
                       onTextChanged: (String value) {
                         widget.description = value;
                       },
-                    ),
-                  ],
+                    ),*/
                 ),
 
                 SizedBox(
@@ -235,17 +317,20 @@ class _SecondScreenState extends State<SecondScreen> {
                     onPressed: () async {
                       Map<String, dynamic> updateInfo = {
                         "Title": widget.title,
-                        "Image": imageUrl=="" ? widget.image:imageUrl,
+                        "Image": imageUrl == "" ? widget.image : imageUrl,
                         "Description": widget.description,
                         "Id": widget.id,
                       };
                       await DatabaseMethods()
                           .UpdateListDetails(widget.id, updateInfo)
                           .then((value) {
-                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HomeScreen()));
                       });
 
-                      imageUrl='';
+                      imageUrl = '';
                     },
                     child: Text('Update'))
 
