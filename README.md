@@ -10,6 +10,7 @@ VickeyPedia is a simple knowledge management system that allows users to create,
 3. **Edit**: Modify existing articles to keep information up-to-date.
 4. **Delete**: Remove articles that are no longer needed.
 
+
 ## Technologies Used
 
 - **Flutter**: A powerful framework for building cross-platform mobile applications.
