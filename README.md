@@ -2,7 +2,6 @@
 
 VickeyPedia is a simple knowledge management system that allows users to create, search, edit, and delete articles. It's designed to be lightweight and easy to use.
 
-
 ## Features
 
 1. **Search**: Quickly find articles using keywords or phrases.
